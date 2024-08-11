@@ -1,3 +1,4 @@
+--INICIO DE ARCHIVO
 CREATE DATABASE Personas;
 GO
 
@@ -132,16 +133,15 @@ BEGIN
 END;
 GO
 
---Ejecución del sp
-
+--Ejecución del sp ActualizarNombrePorEdad
 USE [Personas]
 GO
 
 DECLARE	@return_value int
 
 EXEC	@return_value = [dbo].[ActualizarNombrePorEdad]
-		@NombreNuevo = N'NombreNuevo',
-		@Edad = 99
+		@NombreNuevo = N'Pepe',
+		@Edad = 37
 
 SELECT	'Return Value' = @return_value
 
@@ -151,3 +151,4 @@ GO
 
 --delete from Persona where ID > 5;
 
+--FIN DE ARCHIVO
