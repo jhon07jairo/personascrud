@@ -14,18 +14,17 @@ CREATE TABLE Persona (
 );
 GO
 
+--Cambio de Documento NVARCHAR a INT
 ALTER TABLE Persona
 DROP CONSTRAINT UQ__Persona__AF73706D41789839;
 
--- Convertir la columna Documento a BIGINT (o INT si es más adecuado)
 ALTER TABLE Persona
 ALTER COLUMN Documento INT NOT NULL;
 
--- Volver a agregar la restricción UNIQUE
 ALTER TABLE Persona
 ADD CONSTRAINT UQ_Documento UNIQUE (Documento);
 
--- 4. Inserción de cinco personas
+-- Inserción de cinco personas
 INSERT INTO Persona (Nombre, Apellidos, Documento, FechaNacimiento, Sexo)
 VALUES 
 ('Jhon', 'López', '123456789', '1997-11-07', 'M'),
@@ -35,7 +34,7 @@ VALUES
 ('James', 'Rodriguez', '321654987', '1982-09-25', 'M');
 GO
 
--- 5. Creación de una tabla de países
+-- Creación de una tabla de países
 CREATE TABLE Pais (
     CodigoPais CHAR(3) PRIMARY KEY,
     NombrePais NVARCHAR(50) NOT NULL,
@@ -43,12 +42,7 @@ CREATE TABLE Pais (
 );
 GO
 
--- 6. Restricciones ya implementadas:
--- - Clave primaria en CodigoPais
--- - Valores no nulos en NombrePais y PorDefecto
--- - Restricción CHECK en PorDefecto (0 para falso, 1 para verdadero)
-
--- 7. Inserción de cuatro países
+-- Inserción de cuatro países
 INSERT INTO Pais (CodigoPais, NombrePais, PorDefecto)
 VALUES
 ('COL', 'Colombia', 1),
@@ -57,12 +51,12 @@ VALUES
 ('ARG', 'Argentina', 0);
 GO
 
--- 8. Modificación de la tabla de personas para incluir el país
+-- Modificación de la tabla de personas para incluir el país
 ALTER TABLE Persona
 ADD CodigoPais CHAR(3) FOREIGN KEY REFERENCES Pais(CodigoPais);
 GO
 
--- 9. Actualización del país de las personas
+-- Actualización del país de las personas
 UPDATE Persona SET CodigoPais = 'COL' WHERE Documento = '123456789';
 UPDATE Persona SET CodigoPais = 'ARG' WHERE Documento = '987654321';
 UPDATE Persona SET CodigoPais = 'POR' WHERE Documento = '456123789';
@@ -70,7 +64,7 @@ UPDATE Persona SET CodigoPais = 'COL' WHERE Documento = '789456123';
 UPDATE Persona SET CodigoPais = 'COL' WHERE Documento = '321654987';
 GO
 
--- 10. Creación de una función para contar personas por país
+-- Creación de una función para contar personas por país
 CREATE FUNCTION ContarPersonasPorPais(@CodigoPais CHAR(3))
 RETURNS INT
 AS
@@ -81,7 +75,10 @@ BEGIN
 END;
 GO
 
--- 11. Creación de una vista para personas del país por defecto
+--Ejecución de función ContarPersonasPorPais 
+SELECT dbo.ContarPersonasPorPais('COL') AS NumeroDePersonas;
+
+-- Creación de una vista para personas del país por defecto
 CREATE VIEW VistaPersonasPorDefecto AS
 SELECT 
     Nombre, 
@@ -95,13 +92,16 @@ WHERE
     CodigoPais = (SELECT CodigoPais FROM Pais WHERE PorDefecto = 1);
 GO
 
--- 12. Creación de una secuencia
+-- Select de vista con formato de fecha ‘dd-mm-yyyy’
+SELECT * FROM dbo.VistaPersonasPorDefecto;
+
+-- Creación de una secuencia
 CREATE SEQUENCE SecuenciaDocumento
     START WITH 100000
     INCREMENT BY 1;
 GO
 
--- 13. Construcción de un ciclo WHILE para insertar 1,000 personas
+-- Construcción de un ciclo WHILE para insertar 1,000 personas
 DECLARE @i INT = 1;
 DECLARE @Documento NVARCHAR(20);
 
@@ -114,7 +114,7 @@ BEGIN
 END;
 GO
 
--- 14. Creación de un procedimiento almacenado
+-- Creación del procedimiento almacenado
 CREATE PROCEDURE ActualizarNombrePorEdad
     @NombreNuevo NVARCHAR(50),
     @Edad INT
@@ -132,5 +132,22 @@ BEGIN
 END;
 GO
 
+--Ejecución del sp
+
+USE [Personas]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[ActualizarNombrePorEdad]
+		@NombreNuevo = N'NombreNuevo',
+		@Edad = 99
+
+SELECT	'Return Value' = @return_value
+
+GO
+
+
+
 --delete from Persona where ID > 5;
- 
+
